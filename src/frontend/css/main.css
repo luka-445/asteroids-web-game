@@ -1,0 +1,53 @@
+/*Font face, I found a the closest possible font to the classic arcade style font used on a website called font face*/
+/*Download is free personal use license, and can be found in the assets/font folder with a readme including the license details*/
+@font-face
+{
+    font-family: 'ArcadeClassic';
+    src: url('../../assets/fonts/VectorBattle-e9XO.ttf') format('truetype');
+}
+
+/* attribute selectors styles*/
+html, body
+{
+    height: 100%;
+    width: 100%;
+    font-family: 'ArcadeClassic', sans-serif;
+}
+
+body 
+{
+    margin:0;
+    background-color: black;
+
+    display: flex;
+    flex-direction: column;
+}
+
+button
+{
+    margin: 50px;
+    color:white;
+    background-color: transparent;
+    border-style: hidden;
+    font-size: 24px;
+    font-family: inherit;
+}
+
+/* id selectors styles*/
+#game-title 
+{
+    color:white;
+    text-align: center;
+    font-size: 64px;
+}
+
+#main-menu-navigations
+{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+

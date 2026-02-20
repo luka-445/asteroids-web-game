@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Asteroids</title>
+    <link rel="stylesheet" href="css/game.css"/>
+</head>
+
+    <body>
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div id="hud"> 
+            <div>Score: <span id="score"></span></div>
+            <div>Time: <span id="time"></span></div>
+        </div>
+    </body>
+
+
+
+
+<!-- Type needs to be specified as not javascript, otherwise it will try to run the shaders as javascript code resulting in errors -->
+<!-- Shaders are a c like language called GLSL and are necessary for graphic applications, the basic idea is object data i.e vectors  
+     representing pixel data get sent to vertex shader (vs) as input which does some stuff through code and then the vs outputs
+     it to the fragment shader (fs) which does the basically the same thing. 
+     vertex shader can be viewed as doing operations on the individual pixels like changing the colour of one pixel hence the name 
+     vertex shader, and then the fragment shader is a larger part where each fragment blends all of the pixels in it to get the 
+     desired colour/lighting or whatever effect. They can also just do nothing, since a fs and vs are needed to actually draw pixels, 
+     they must do atleast the basic operation of just specifying the location of that pixel and fragment are to be drawn on the screen. -->
+
+<!-- Vertex Shader -->
+<script id="vertex-shader-2d" type="notjs">#version 300 es 
+precision mediump float;
+
+layout (location = 0) in vec2 aPosition;
+layout (location = 1) in vec3 aColor;
+
+out vec3 vColor;
+
+void main()
+{
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    vColor = aColor;
+}
+</script>
+
+<!-- Fragment Shader-->
+<script id="fragment-shader-2d" type="notjs">#version 300 es
+precision mediump float;
+
+in vec3 vColor;
+
+out vec4 fragColor;
+
+void main()
+{
+    fragColor = vec4(vColor, 1.0);
+}
+</script>
+
+<!-- Javascript scripts -->
+ <script src="javascript/game.js"></script>
+ <script src="javascript/main.js"></script>
+
+ </html>
