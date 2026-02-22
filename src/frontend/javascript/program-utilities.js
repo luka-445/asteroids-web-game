@@ -7,6 +7,7 @@ export class ProgUtils
 
         /**
      * create a webgl program
+     * @param gl - WebGL rendering context
      * @param vertexShader - vertex shader
      * @param fragmentShader - fragment shader
      * @returns {WebGLProgram} - webgl program
@@ -30,6 +31,7 @@ export class ProgUtils
 
     /**
      * create a shader
+     * @param gl - WebGL rendering context
      * @param {number} shaderType - gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
      * @param {string} ShaderSource  - shader source code
      * @returns {WebGLShader} - webgl shader.
@@ -52,6 +54,7 @@ export class ProgUtils
 
     /**
      * create a buffer to store data to the gpu
+     * @param gl - WebGL rendering context
      * @param {*} data  - data to store
      * @returns {WebGLBuffer}
      */
@@ -66,6 +69,7 @@ export class ProgUtils
 
     /**
      * A function to create an Element array buffer
+     * @param gl - WebGL rendering context
      * @param  data - array of indices
      * @returns {WebGLBuffer}
      */

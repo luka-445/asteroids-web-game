@@ -1,11 +1,11 @@
 // Main javascript file, this will be responsible for the webGL render loop as well as calling on the other functions
 // in the correct order.
 
-import { Game } from "./game.js"
+import { Engine } from "./engine.js"
 
-const game = new Game();
-game.initialize().then(() => 
+const engine = new Engine();
+engine.initialize().then(() => 
 {
-    game.Render();
+    engine.draw();
 }); // wait for the game to initialize before rendering anything
 
