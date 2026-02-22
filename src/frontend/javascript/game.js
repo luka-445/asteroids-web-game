@@ -2,23 +2,33 @@ const vertexShaderSource = document.getElementById("vertex-shader-2d").textConte
 const fragmentShaderSource = document.getElementById("fragment-shader-2d").textContent;
 
 
-class Game
+import { Camera } from "./camera.js"
+
+
+export class Game
 {
     constructor()
     {
-        
+
+
     }
 
     async initialize()
     {
         this.canvas = document.getElementById('canvas');
         this.gl = this.canvas.getContext('webgl2');
+        this.camera = new Camera(this.canvas.width, this.canvas.height);
 
         const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
         const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
 
         this.program = this.createProgram(vertexShader, fragmentShader);
+        this.projectionViewMatrixLocation = this.gl.getUniformLocation(this.program, "projectionViewMatrix");
+
         this.gl.useProgram(this.program);
+
+
+
 
 
         // https://learnopengl.com/Getting-started/Shaders --> this website explains how shaders work, its the standard way to code and 
@@ -29,11 +39,20 @@ class Game
         // Create a buffer from the vertex data. the buffer is interleaved meaning that we store both the vertex data and the color data
         // for the vertex into the same line, and we can tell the gpu how to recognize whether its reading vertex data or color data by
         // setting stride and offset in vertexAttribPointer.
-        this.createBuffer([
-            // x, y,    r, g, b
-            -0.5, 0,    1, 1, 1,
-            0.5, 0,     1, 1, 1,
-            0, 0.5,     1, 1, 1
+
+        // We need to edit this after adding a projection matrix, since coordinates are no longer normalized to -1 and 1 on the canvas, these values are being drawn, but they 
+        // are to small to even see.
+
+        const x = 100;
+        const y = 100;
+        const w = 100; // width
+        const h = 100; // height
+
+        const buffer = this.createBuffer([
+         // x,     y,         r, g, b
+            x,     y,         1, 1, 1, // top of triangle
+            x + w, y + h,     1, 1, 1, // bottom right corner
+            x - w, y + h,     1, 1, 1 // bottom left corner
         ])
 
         // You can think of strides as the way gpu separates data, so for vertex 1 we have x,y coordinates and the color of that vertex
@@ -125,9 +144,12 @@ class Game
 
     Render()
     {
+        this.camera.update();
+
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0); //rgba for black, this sets the color we want to reset to when we clear.
         this.gl.clear(this.gl.COLOR_BUFFER_BIT); // clears color.
 
+        this.gl.uniformMatrix4fv(this.projectionViewMatrixLocation, false, this.camera.projectionViewMatrix);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
 
     }

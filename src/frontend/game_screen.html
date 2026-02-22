@@ -6,15 +6,12 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Asteroids</title>
-    <link rel="stylesheet" href="css/game.css"/>
+    <!--<link rel="stylesheet" href="css/game.css"/>-->
 </head>
 
     <body>
         <canvas id="canvas" width="800" height="600"></canvas>
-        <div id="hud"> 
-            <div>Score: <span id="score"></span></div>
-            <div>Time: <span id="time"></span></div>
-        </div>
+
     </body>
 
 
@@ -38,9 +35,11 @@ layout (location = 1) in vec3 aColor;
 
 out vec3 vColor;
 
+uniform mat4 projectionViewMatrix;
+
 void main()
 {
-    gl_Position = vec4(aPosition, 0.0, 1.0);
+    gl_Position = projectionViewMatrix * vec4(aPosition, 0.0, 1.0);
     vColor = aColor;
 }
 </script>
@@ -60,7 +59,7 @@ void main()
 </script>
 
 <!-- Javascript scripts -->
- <script src="javascript/game.js"></script>
- <script src="javascript/main.js"></script>
+ <script src="javascript/gl-matrix.js"></script>
+ <script type = "module" src="javascript/main.js"></script>
 
  </html>
