@@ -3,6 +3,7 @@ const fragmentShaderSource = document.getElementById("fragment-shader-2d").textC
 
 
 import { Camera } from "./camera.js"
+import { ProgUtils } from "./program-utilities.js"
 
 
 export class Game
@@ -19,17 +20,13 @@ export class Game
         this.gl = this.canvas.getContext('webgl2');
         this.camera = new Camera(this.canvas.width, this.canvas.height);
 
-        const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
-        const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+        const vertexShader = ProgUtils.createShader(this.gl, this.gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = ProgUtils.createShader(this.gl, this.gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-        this.program = this.createProgram(vertexShader, fragmentShader);
+        this.program = ProgUtils.createProgram(this.gl, vertexShader, fragmentShader);
         this.projectionViewMatrixLocation = this.gl.getUniformLocation(this.program, "projectionViewMatrix");
 
         this.gl.useProgram(this.program);
-
-
-
-
 
         // https://learnopengl.com/Getting-started/Shaders --> this website explains how shaders work, its the standard way to code and 
         // define shaders. all shader code follows this pipeline: write source code -> create shader from source code -> create program ->
@@ -43,12 +40,12 @@ export class Game
         // We need to edit this after adding a projection matrix, since coordinates are no longer normalized to -1 and 1 on the canvas, these values are being drawn, but they 
         // are to small to even see.
 
-        const x = 100;
-        const y = 100;
+        const x = 0;
+        const y = 0;
         const w = 100; // width
         const h = 100; // height
 
-        const buffer = this.createBuffer([
+        const buffer = ProgUtils.createBuffer(this.gl, [
          // x,     y,         r, g, b
             x,     y,         1, 1, 1, // top of triangle
             x + w, y + h,     1, 1, 1, // bottom right corner
@@ -69,78 +66,7 @@ export class Game
         this.gl.enableVertexAttribArray(1);
     }
 
-    /**
-     * create a webgl program
-     * @param vertexShader - vertex shader
-     * @param fragmentShader - fragment shader
-     * @returns {WebGLProgram} - webgl program
-     */
-    createProgram(vertexShader, fragmentShader)
-    {
-        const program = this.gl.createProgram();
-        this.gl.attachShader(program, vertexShader);
-        this.gl.attachShader(program, fragmentShader);
-        this.gl.linkProgram(program);
 
-        const success = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
-        if (!success)
-        {
-            console.error("program failed to link:" + this.gl.getProgramInfoLog(program));
-            this.gl.deleteProgram(program);
-        }
-
-        return program;
-    }
-
-    /**
-     * create a shader
-     * @param {number} shaderType - gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
-     * @param {string} ShaderSource  - shader source code
-     * @returns {WebGLShader} - webgl shader.
-     */
-    createShader(shaderType, shaderSource)
-    {
-        const shader = this.gl.createShader(shaderType);
-        this.gl.shaderSource(shader, shaderSource);
-        this.gl.compileShader(shader);
-
-        const success = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
-        if (!success)
-        {
-            console.error("shader failed to compile" + this.gl.getShaderInfoLog(shader));
-            this.gl.deleteShader(shader);
-        }
-
-        return shader;
-    }
-
-    /**
-     * create a buffer to store data to the gpu
-     * @param {*} data  - data to store
-     * @returns {WebGLBuffer}
-     */
-    createBuffer(data)
-    {
-        const buffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(data), this.gl.STATIC_DRAW);
-
-        return buffer;
-    }
-
-    /**
-     * A function to create an Element array buffer
-     * @param  data - array of indices
-     * @returns {WebGLBuffer}
-     */
-    createIndexBuffer(data)
-    {
-        const buffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), this.gl.STATIC_DRAW);
-
-        return buffer;
-    }
 
     Render()
     {
