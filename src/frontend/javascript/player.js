@@ -1,4 +1,4 @@
-const { mat4, vec2, vec3 } = glMatrix;
+const { mat4, vec2 } = glMatrix;
 
 
 export class Player 
@@ -9,24 +9,32 @@ export class Player
      * @param x - the x coordinate 
      * @param y - the y coordinate
      */
-    constructor(gl, width, height)
+    constructor(gl, x, y)
     {
         this.position = {x, y};
         this.rotation = 0;
     }
 
+    // local model vertices
     static vertices()
     {
+        // I found a colour in an rgb colour picker with values of 49, 6, 59, to convert to WebGL, since it only goes from 0 to 1 we divide by 255 since its na 8bit integer value
         return [
-      // x,    y,   r, g, b
-         0,   -40,   1, 1, 1,
-        -12, -10,   1, 1, 1,
-         12, -10,   1, 1, 1,
+      // x,    y,    r, g, b
+         0,   -40,   49/255, 6/255, 59/255,
+        -12, -10,    49/255, 6/255, 59/255,
+         12, -10,    49/255, 6/255, 59/255
         ]
     }
 
     static indices()
     {
         return [0, 1, 2];
+    }
+
+    // internal function to draw player using its model transformation matrix.
+    draw(renderer)
+    {
+        renderer.draw();
     }
 }

@@ -34,6 +34,11 @@ export class Renderer
         this.instanceCount = 0; // # of mesh objects currently drawn into the canvas
         this.canvasCenterX = width * 0.5; // Store the coordinates for the center of the canvas
         this.canvasCenterY = height * 0.5;
+
+        this.v0 = vec2.create();
+        this.v1 = vec2.create();
+        this.v2 = vec2.create();
+        this.rotationOrigin = vec2.create();
     }
 
     async initialize()
@@ -93,9 +98,9 @@ export class Renderer
     }
 
     // This function will fill in the buffer with the vertex data, in otherwords we are literally 'drawing' on the canvas.
-    draw()
+    draw(vertices, position,  scale, rotation)
     {
-        this.fillVertexBuffer(Player.vertices())
+        this.fillVertexBuffer(vertices, position, scale, rotation);
     }
 
     // This function are operations that need to be done after drawing.
@@ -111,17 +116,95 @@ export class Renderer
     }
 
     // Function for filling buffer with vertexdata,
-    fillVertexBuffer(vertices)
+    fillVertexBuffer(vertices, position, scale, rotation)
     {
         let i = this.instanceCount * BUFFER_SIZE; // ensure we start at the correct position in the buffer. so if instanceCount is 0, we start at 0, and if its 1 we start 1 * BUFFER_SIZE.
-        for (let j = 0; j < vertices.length; j += 5)
+
+        const x0 = vertices[0], y0 = vertices[1];
+        const x1 = vertices[5], y1 = vertices[6];
+        const x2 = vertices[10], y2 = vertices[11];
+
+        const cx = (x0 + x1 + x2) / 3.0;
+        const cy = (y0 + y1 + y2) / 3.0;
+
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+
+        const rot = (x, y, out) => 
         {
-            this.data[i + j + 0] = vertices[j + 0] + this.canvasCenterX; // x
-            this.data[i + j + 1] = vertices[j + 1] + this.canvasCenterY; // y
-            this.data[i + j + 2] = vertices[j + 2]; // r
-            this.data[i + j + 3] = vertices[j + 3]; // g
-            this.data[i + j + 4] = vertices[j + 4]; // b
+            // translate to pivot
+            let dx = (x - cx) * scale;
+            let dy = (y - cy) * scale;
+
+            // rotate
+            const rx = dx * cos - dy * sin;
+            const ry = dx * sin + dy * cos;
+
+            // translate back from pivot
+            out[0] = rx + cx * scale;
+            out[1] = ry + cy * scale;
+        };
+
+        rot(x0, y0, this.v0);
+        rot(x1, y1, this.v1);
+        rot(x2, y2, this.v2);
+
+        // world to screen. the world is centered at canvas center.
+        const ox = this.canvasCenterX + position[0];
+        const oy = this.canvasCenterY + position[1];
+
+        // v0
+        this.data[0 + i] = this.v0[0] + ox;
+        this.data[1 + i] = this.v0[1] + oy;
+        this.data[2 + i] = vertices[2]; this.data[3 + i] = vertices[3]; this.data[4 + i] = vertices[4];
+
+        // v1
+        this.data[5 + i] = this.v1[0] + ox;
+        this.data[6 + i] = this.v1[1] + oy;
+        this.data[7 + i] = vertices[7]; this.data[8 + i] = vertices[8]; this.data[9 + i] = vertices[9];
+
+        // v2
+        this.data[10 + i] = this.v2[0] + ox;
+        this.data[11 + i] = this.v2[1] + oy;
+        this.data[12 + i] = vertices[12]; this.data[13 + i] = vertices[13]; this.data[14 + i] = vertices[14];
+        /*
+        this.v0[0] = vertices[0] + this.canvasCenterX;
+        this.v0[1] = vertices[1] + this.canvasCenterY;
+        this.v1[0] = vertices[5] + this.canvasCenterX;
+        this.v1[1] = vertices[6] + this.canvasCenterY;
+        this.v2[0] = vertices[10] + this.canvasCenterX;
+        this.v2[1] = vertices[11] + this.canvasCenterY;
+
+        if (rotation != 0)
+        {
+            this.rotationOrigin[0] = (this.v0[0] + this.v1[0] + this.v2[0]) / 3.0;
+            this.rotationOrigin[1] = (this.v0[1] + this.v1[1] + this.v2[1]) / 3.0;
+
+            vec2.rotate(this.v0, this.v0, this.rotationOrigin, rotation);
+            vec2.rotate(this.v1, this.v1, this.rotationOrigin, rotation);
+            vec2.rotate(this.v2, this.v2, this.rotationOrigin, rotation);
+
         }
+
+        this.data[0 + i] = this.v0[0];
+        this.data[1 + i] = this.v0[1];
+        this.data[2 + i] = 1;
+        this.data[3 + i] = 1;
+        this.data[4 + i] = 1;
+
+        this.data[5 + i] = this.v1[0];
+        this.data[6 + i] = this.v1[1];
+        this.data[7 + i] = 1;
+        this.data[8 + i] = 1;
+        this.data[9 + i] = 1;
+
+        this.data[10 + i] = this.v2[0];
+        this.data[11 + i] = this.v2[1];
+        this.data[12 + i] = 1;
+        this.data[13 + i] = 1;
+        this.data[14 + i] = 1;
+        */
+
         this.instanceCount++; // increment instances after filling up all the data for one object.
     }
 
