@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Game Over</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <h1 id="game-title">Game Over</h1>
+    
+    <div id="main-menu-navigations">
+        <div id="finalResults">
+            <div id="finalScoreText">Final Score: 0</div>
+            <div id="finalTimeText">Time: 00:00</div>
+        </div>
+
+        <div id="userNameInput">
+            Name:
+            <input id="nameInput" maxlength="16">
+        </div>
+
+
+        <button id="submitButton">Submit Score</button>
+        <button id="playAgainButton">Play Again</button>
+        <button id="leaderboardButton">View Leaderboard</button>
+
+    </div>
+
+
+    <script>
+        function formatTime(totalSeconds)
+        {
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // Buttons
+        document.getElementById("playAgainButton").addEventListener("click", () => {
+            window.location.href = "game_screen.html";
+        });
+
+        document.getElementById("leaderboardButton").addEventListener("click", () => {
+            window.location.href = "leaderboard.html";
+        });
+
+        const finalScoreText = document.getElementById("finalScoreText");
+        const finalTimeText  = document.getElementById("finalTimeText");
+
+        const score = parseInt(localStorage.getItem("finalScore") || "0", 10);
+        const timeSeconds = parseInt(localStorage.getItem("finalTime") || "0", 10);
+
+        finalScoreText.textContent = `Final Score: ${score}`;
+        finalTimeText.textContent = `Time: ${formatTime(timeSeconds)}`;
+
+        const submitButton = document.getElementById("submitButton");
+        const nameInput = document.getElementById("nameInput");
+
+        submitButton.addEventListener("click", async () => {
+            const name = (nameInput.value || "").trim() || "Player";
+        
+            try
+            {
+                const res = await fetch("/api/scores", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({name, score, timeSeconds})
+                });
+
+                if (!res.ok) 
+                {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || "Failed to submit score");
+                    return;
+                }
+
+                window.location.href = "leaderboard.html"
+            } 
+            catch (err)
+            {
+                alert("Server not reachable.");
+                console.error(err);
+            }
+        });
+    </script>
+
+    
+</body>
+</html>

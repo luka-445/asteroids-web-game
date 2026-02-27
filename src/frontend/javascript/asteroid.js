@@ -25,7 +25,7 @@ export class Asteroid
     {
         if (this.sizeTier === 3) return 45;
         if (this.sizeTier === 2) return 25;
-        return 12;
+        return 15;
     }
     
     getScale()

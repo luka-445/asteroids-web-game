@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Leaderboard</title>
+
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <h1 id="game-title">Leaderboard</h1>
+
+  <div id="main-menu-navigations">
+
+    <div id="lbList"
+         style="color:white; font-size:24px; white-space:pre; margin-top:40px;">
+    </div>
+
+    <button onclick="window.location.href='main_page.html'">
+      Back to Menu
+    </button>
+
+  </div>
+
+  <script>
+    async function loadLeaderboard() {
+    const el = document.getElementById("lbList");
+
+    try {
+        const res = await fetch("/api/scores?limit=10");
+        if (!res.ok) throw new Error("bad response");
+
+        const list = await res.json();
+
+        if (!list.length) {
+        el.textContent = "No scores yet.";
+        return;
+        }
+
+        let out = "";
+        for (let i = 0; i < list.length; i++) {
+        const rank = (i + 1) + ".";
+        const name = (list[i].name || "Player").padEnd(12, " ");
+        const score = String(list[i].score ?? 0);
+        out += `${rank} ${name} ${score}\n`;
+        }
+        el.textContent = out.trimEnd();
+    } catch (e) {
+        el.textContent = "Could not load leaderboard. Is backend running?";
+    }
+    }
+
+    loadLeaderboard();
+  </script>
+
+</body>
+</html>

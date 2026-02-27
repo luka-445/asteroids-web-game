@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/luka-445/asteroids-web-game#readme",
   "dependencies": {
+    "better-sqlite3": "^12.6.2",
     "express": "^5.2.1"
   }
 }

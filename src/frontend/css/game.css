@@ -1,5 +1,11 @@
 /* Seperate css file specifically for the game screen, since the hud will have to be styled differently and seperating is easier.*/
 
+@font-face
+{
+    font-family: 'ArcadeClassic';
+    src: url('/assets/fonts/VectorBattle-e9XO.ttf') format('truetype');
+}
+
 html, body
 {
     margin: 0;
@@ -29,7 +35,7 @@ html, body
     z-index: 10;
     pointer-events: none;
     color: white;
-    font-family:Arial, sans-serif;
+    font-family:'ArcadeClassic', sans-serif;
     font-size: 20px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }

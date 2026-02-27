@@ -3,7 +3,7 @@
 @font-face
 {
     font-family: 'ArcadeClassic';
-    src: url('../../assets/fonts/VectorBattle-e9XO.ttf') format('truetype');
+    src: url('/assets/fonts/VectorBattle-e9XO.ttf') format('truetype');
 }
 
 /* attribute selectors styles*/
@@ -25,13 +25,22 @@ body
 
 button
 {
-    margin: 50px;
+    margin: 16px 0;
+    padding: 10px 18px;
     color:white;
     background-color: transparent;
     border-style: hidden;
     font-size: 24px;
     font-family: inherit;
+    cursor: pointer;
+    line-height: 1;
 }
+
+button:hover
+{
+    text-decoration: underline;
+}
+
 
 /* id selectors styles*/
 #game-title 
@@ -49,5 +58,36 @@ button
     align-items: center;
     flex-direction: column;
 }
+
+#finalResults
+{
+    color: white;
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+#userNameInput
+{
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0 30px;
+}
+
+#userNameInput input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid white;
+  color: white;
+  font-size: 22px;
+  font-family: inherit;
+  outline: none;
+  width: 260px;
+}
+
+
 
 

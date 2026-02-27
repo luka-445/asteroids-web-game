@@ -155,7 +155,20 @@ export class Engine
 
         // decided to move it after the rendering because it felt like nothing was hitting the ship, but in actual we just werent redrawing the new asteroid positions.
         if (this.checkPlayerCollision())
-        {
+        {   
+
+            // compute final time at collision
+            const now = performance.now();
+            const finalTimeSeconds = Math.floor((now - this.startTime) / 1000);
+
+            // store results for the game over screen
+            localStorage.setItem("finalScore", String(this.score));
+            localStorage.setItem("finalTime", String(finalTimeSeconds));
+
+            // go to game over screen
+            window.location.href = "game-over-screen.html";
+            return; // stops the game loop
+            /*
             // just reset the game for now, until the game over screen is made.
             this.asteroids = [];
             this.projectiles = [];
@@ -165,6 +178,7 @@ export class Engine
             // respawn
             this.spawnAsteroids(6);
             this.spawnCooldown = this.spawnInterval;
+            */
         }
 
         // updates score
