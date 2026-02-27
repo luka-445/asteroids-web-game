@@ -5,11 +5,28 @@ A browser version of the Asteroids arcade game from 1979 with an online leaderbo
 
 ## Project Board
 
+# How to Run backend/frontend locally
 
+1. Ensure Node.js is installed. Run the following commands in a terminal
+    - node -v
+    - npm -v
+
+2. Install Depedencies
+    - npm install
+    This installs express, better-splite3
+
+3. Start the server
+    Open the root folder in the terminal and run this command
+     - node src/backend/server.js
+
+4. Open in browser
+    Go to: http://localhost:3000/main_page.html
+
+Now you should be able to see the main_page through the server. do not open any html files through folder by double clicking, this will not go through the server.
 ## Languages and APIs to be used
 - WebGL for frontend rendering
 - Javascript
-- Backend (To be determined)
+- Backend: Node.js
 - Relational Database (To be determined)
 
 ## Project Structure
