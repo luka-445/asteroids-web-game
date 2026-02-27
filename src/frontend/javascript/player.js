@@ -1,3 +1,13 @@
+/**
+ * player.js
+ *
+ * Defines the Player ship.
+ *
+ * Notes:
+ * - Player is rendered as a triangle.
+ * - Rotation is stored on the player and applied by the renderer.
+ */
+
 const { mat4, vec2 } = glMatrix;
 
 

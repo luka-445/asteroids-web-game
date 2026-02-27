@@ -1,3 +1,16 @@
+/**
+ * program-utilities.js
+ *
+ * WebGL helper utilities.
+ *
+ * Responsibilities:
+ * - Compile shaders.
+ * - Link shader programs.
+ * - Look up attribute/uniform locations.
+ *
+ * Keeping these utilities separate keeps renderer.js cleaner.
+ */
+
 export class ProgUtils
 {
     constructor()

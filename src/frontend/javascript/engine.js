@@ -1,4 +1,19 @@
-/**engine.js, this is the game engine that will run all other operations */
+/**
+ * engine.js
+ *
+ * game loop
+ *
+ * Responsibilities:
+ * - Creates and initializes subsystems (Renderer, InputManager).
+ * - Owns the world state (player, asteroids, projectiles, score, timers).
+ * - Runs the per-frame update loop:
+ *     1) handle input
+ *     2) update entities
+ *     3) resolve collisions
+ *     4) render
+ * - Handles screen resize for full-screen canvas.
+ */
+
 
 
 import { Renderer } from "./renderer.js"
@@ -9,8 +24,13 @@ import { Projectile } from "./projectile.js"
 
 export class Engine
 {
+    /** Creates an Engine instance. Call initialize() before draw(). */
     constructor(){}
 
+    /**
+     * Initializes all game systems and prepares the first playable state.
+     * This is async because the Renderer compiles shaders and may fetch shader sources.
+     */
     async initialize()
     {
         this.inputManager = new InputManager();
@@ -38,7 +58,7 @@ export class Engine
 
         this.asteroids = [];
         this.spawnAsteroids(6);
-        this.maxAsteroids = 8; // mat asteroids allowed
+        this.maxAsteroids = 8; // max asteroids allowed
         this.spawnCooldown = 0; // frames until next spawn
         this.spawnInterval = 60; // spawn every 60 frames
 
@@ -49,8 +69,13 @@ export class Engine
         this.canvas.addEventListener("click", (e) => this.hitAsteroidAtMouse(e));
     }
 
+    /**
+     * Main per-frame loop.
+     * Uses requestAnimationFrame to schedule the next frame.
+     */
     draw()
-    {
+    {   
+        // Rotates the player based on input of 'a' and 'd' keys on the keyboard
         const rotationSpeed = 0.04;
         if (this.inputManager.isKeyDown("a"))
         {
@@ -103,7 +128,7 @@ export class Engine
             {
                 const ast = this.asteroids[a];
 
-                // use the circle hit test algo already in asteroids
+                // use the circle hit test algorithm already in asteroids
                 if (ast.containsPoint(proj.position[0], proj.position[1]))
                 {
                     // remove the projectile
@@ -124,7 +149,7 @@ export class Engine
         }
 
 
-        // continuous spawnign for asteroids
+        // continuous spawning for asteroids
         if (this.spawnCooldown > 0) this.spawnCooldown--;
 
         const bigCount = this.countBigAsteroids();
@@ -153,10 +178,10 @@ export class Engine
 
         this.renderer.end();
 
-        // decided to move it after the rendering because it felt like nothing was hitting the ship, but in actual we just werent redrawing the new asteroid positions.
+        // decided to move it after the rendering because it felt like nothing was hitting the ship, but in actual we just werent redrawing the new asteroid positions
+        // before checking for collision
         if (this.checkPlayerCollision())
         {   
-
             // compute final time at collision
             const now = performance.now();
             const finalTimeSeconds = Math.floor((now - this.startTime) / 1000);
@@ -168,17 +193,6 @@ export class Engine
             // go to game over screen
             window.location.href = "game-over-screen.html";
             return; // stops the game loop
-            /*
-            // just reset the game for now, until the game over screen is made.
-            this.asteroids = [];
-            this.projectiles = [];
-            this.score = 0;
-            this.startTime = performance.now();
-
-            // respawn
-            this.spawnAsteroids(6);
-            this.spawnCooldown = this.spawnInterval;
-            */
         }
 
         // updates score
@@ -200,6 +214,10 @@ export class Engine
         window.requestAnimationFrame(() => this.draw()); // game loop
     }
 
+    /**
+     * Spawns N BIG asteroids (tier 3) along the screen edges.
+     * Medium/small asteroids are only created via splitting.
+     */
     spawnAsteroids(count)
     {
         for (let k = 0; k < count; k++)
@@ -240,7 +258,6 @@ export class Engine
         }
     }
 
-
     // used for Testing if asteroids split properly when pressed.
     hitAsteroidAtMouse(e)
     {
@@ -266,6 +283,10 @@ export class Engine
         }
     }
 
+    /**
+     * Spawns a projectile in front of the player ship.
+     * Projectile direction is taken from the player's forward vector (ship tip).
+     */
     shoot()
     {
         const theta = this.player.rotation;
@@ -286,6 +307,8 @@ export class Engine
         this.projectiles.push(new Projectile(px, py, vx, vy));
     }
 
+    // A function to spawn asteroids in wave, no longer used since its been changed to have asteroids spawn continuously rather than in waves. still good to keep in case
+    // we want to use in the future
     startNextWave()
     {
         const count = this.asteroidsPerWave + (this.wave - 1) * 2; // + 2 each wave
@@ -293,6 +316,10 @@ export class Engine
         this.wave++;
     }
 
+    /**
+     * Checks if any asteroid collision circle overlaps the player collision circle.
+     * @returns {boolean} true if player is hit.
+     */
     checkPlayerCollision()
     {
         // player world position
@@ -314,7 +341,10 @@ export class Engine
         return false;
     }
 
-    // WebGL needs to resize canvas, cant just rely on css.
+    /**
+     * Resizes the canvas + WebGL viewport to match the browser window.
+     * Also updates renderer/camera dimensions so world to screen math remains correct.
+     */
     resize()
     {
         const dpr = window.devicePixelRatio || 1;
@@ -341,11 +371,13 @@ export class Engine
         }
     }
 
+    // Convenience helper: spawns one big asteroid (tier 3). 
     spawnOneBigAsteroid()
     {
         this.spawnAsteroids(1);
     }
 
+    // Counts only tier-3 asteroids (big ones) for continuous spawning.
     countBigAsteroids()
     {
         let count = 0;

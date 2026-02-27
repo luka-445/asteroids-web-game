@@ -1,5 +1,11 @@
-// Main javascript file, this will be responsible for the webGL render loop as well as calling on the other functions
-// in the correct order.
+/**
+ * main.js
+ *
+ * Frontend entry point.
+ * - Creates the Engine.
+ * - Initializes it.
+ * - Starts the render/update loop.
+ */
 
 import { Engine } from "./engine.js"
 

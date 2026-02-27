@@ -1,26 +1,47 @@
+/**
+ * asteroid.js
+ *
+ * Defines the asteroids shape and the operation that the engine will use to check for collision and drawing.
+ *
+ */
+
 const { vec2 } = glMatrix;
 
 export class Asteroid 
 {
-    // size tier 3 = big, 2 = med, 1 = small
+    /**
+     * sizeTier meaning:
+     * - 3 = big asteroid
+     * - 2 = medium asteroid
+     * - 1 = small asteroid
+     *
+     * @param {number} x - initial x position in world space (centered at screen center)
+     * @param {number} y - initial y position in world space (centered at screen center)
+     * @param {number} sizeTier - asteroid size category (defaults to 3/big)
+     */
     constructor(x, y, sizeTier = 3)
-    {
-        this.position = vec2.fromValues(x, y);
-        this.sizeTier = sizeTier;
+    { 
+        this.position = vec2.fromValues(x, y); // World-space position of the asteroid (vec2: [x, y])
+        this.sizeTier = sizeTier; // Store tier first because getSpeed() / getRotationSpeed() depend on it
 
-        // set up a random velocity for the asteroid
-        const angle = Math.random() * Math.PI * 2;
-        const speed = this.getSpeed();
-        this.velocity = vec2.fromValues(Math.cos(angle) * speed, Math.sin(angle) * speed);
+        const angle = Math.random() * Math.PI * 2; // Choose a random direction to travel in (angle in radians from 0..2π)
+        const speed = this.getSpeed();  // Base movement speed depends on size:
+        this.velocity = vec2.fromValues(Math.cos(angle) * speed, Math.sin(angle) * speed); // velocity is measured in "world units per frame"
 
-        this.rotation = Math.random() * Math.PI * 2;
-        this.angularVelocity = this.getRotationSpeed();
+        this.rotation = Math.random() * Math.PI * 2; // Random starting orientation so asteroids don't all look identical.
+        this.angularVelocity = this.getRotationSpeed(); // Angular velocity (radians per frame) based on size
         
-        
-
-        this.radius = this.getRadius(); // for hit collision
+        // Radius used for simple circle-based collision tests
+        // This is not exact triangle collision — it's an approximation (fast and good enough).
+        this.radius = this.getRadius(); 
     }
 
+    /**
+     * Returns collision radius for this asteroid tier.
+     * Used for:
+     * - projectile collision (point vs asteroid circle)
+     * - player collision (circle vs circle)
+     */
     getRadius()
     {
         if (this.sizeTier === 3) return 45;
@@ -28,6 +49,10 @@ export class Asteroid
         return 15;
     }
     
+    /**
+     * Returns draw scale multiplier for this asteroid tier.
+     * This allows one base triangle mesh to represent different sizes.
+     */
     getScale()
     {
         if (this.sizeTier === 3) return 1.0;
@@ -35,6 +60,7 @@ export class Asteroid
         return 0.4;
     }
 
+    // asteroids base mesh in model space.
     static baseVertices()
     {
         return [
@@ -44,13 +70,18 @@ export class Asteroid
              28, 18,    1, 1, 1
         ]
     }
-
+    // returns vertex array for the asteroids
     vertices()
     {
         return Asteroid.baseVertices();
     }
 
-    // this wraps the asteroid, so it appears on the other sideo of the canvas if its goes off screen.
+    /**
+     * Screen warpping: If the asteroid leaves one side of the screen it reappears on the opposite side
+     * 
+     * @param {number} width - canvas width in pixels
+     * @param {number} height  - canvas height in pixels
+     */
     wrap(width, height)
     {
         const halfWidth = width * 0.5;
@@ -82,7 +113,7 @@ export class Asteroid
         this.rotation += this.angularVelocity;
     }
 
-    // Simple circle hit detection algortihm
+    // Simple circle collision detection algortihm
     containsPoint(x, y)
     {
         const dx = x - this.position[0];
@@ -115,6 +146,7 @@ export class Asteroid
         return [a, b];
     }
 
+    // return the base movement speed of teh asteroid relative to the size
     getSpeed()
     {
         if (this.sizeTier === 3) return 0.2; // big asteroid
@@ -122,6 +154,7 @@ export class Asteroid
         return 1.0; // small
     }
 
+    // return base rotation speed of the asteroid relative to the size
     getRotationSpeed()
     {
         if (this.sizeTier === 3) return 0.003;

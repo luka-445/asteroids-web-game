@@ -1,7 +1,21 @@
+/**
+ * camera.js
+ *
+ * Minimal 2D camera.
+ *
+ * In this project the 'world' origin is the center of the canvas.
+ * The camera provides a view transform (currently translation only).
+ */
+
+
 const { mat4 } = glMatrix;
 
 export class Camera
 {
+    /**
+     * @param {number} width Canvas width in pixels.
+     * @param {number} height Canvas height in pixels.
+     */
     constructor(width, height)
     {
         this.projectionViewMatrix = mat4.create();
@@ -11,6 +25,7 @@ export class Camera
         this.height = height;
     }
 
+    // function when called updates the camera.
     update()
     {
         this.projection = mat4.ortho(mat4.create(), 0, this.width, this.height, 0, -1, 1);

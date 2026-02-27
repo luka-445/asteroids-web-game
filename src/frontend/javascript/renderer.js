@@ -1,3 +1,15 @@
+/**
+ * renderer.js
+ *
+ * WebGL renderer responsible for drawing all game entities.
+ *
+ * Current design constraints:
+ * - Batches objects as TRIANGLES only (3 vertices per instance).
+ * - Uses a single dynamic vertex buffer sized for N instances.
+ * - Applies per-object transforms (scale/rotation/translation) on CPU when filling buffer.
+ */
+
+
 import { Camera } from "./camera.js"
 import { ProgUtils } from "./program-utilities.js"
 import { Player } from "./player.js"
@@ -19,7 +31,12 @@ const INDICES_PER_SPRITE = 3; // a triangle has 3 vertices, so 3 indices, will n
 
 export class Renderer
 {
-
+    /**
+     * Creates the renderer.
+     * @param {WebGLRenderingContext} gl WebGL context.
+     * @param {number} width Canvas width in pixels.
+     * @param {number} height Canvas height in pixels.
+     */
     constructor(gl, width, height)
     {
         this.gl = gl; // WebGl rendering context
@@ -41,6 +58,10 @@ export class Renderer
         this.rotationOrigin = vec2.create();
     }
 
+    /**
+     * Loads/compiles shaders, creates buffers, and sets up WebGL state.
+     * Must be awaited before calling begin/draw/end.
+     */
     async initialize()
     {
         this.camera = new Camera(this.width, this.height);
@@ -83,7 +104,7 @@ export class Renderer
         this.setupElementBuffer();
     }
 
-    // This function are operations that need to be done before drawing.
+    // This function are operations that need to be done before drawing. i.e it begins a new frame.
     begin()
     {
         this.instanceCount = 0; // always reset the instance count before drawing.
@@ -98,6 +119,13 @@ export class Renderer
     }
 
     // This function will fill in the buffer with the vertex data, in otherwords we are literally 'drawing' on the canvas.
+    /**
+     * Adds one object instance (triangle) to the CPU-side batch buffer.
+     * @param {number[]} vertices Interleaved vertex array [x,y,r,g,b] * 3.
+     * @param {number[]|Float32Array} position World position [x,y].
+     * @param {number} scale Uniform scale factor.
+     * @param {number} rotation Rotation in radians.
+     */
     draw(vertices, position,  scale, rotation)
     {
         this.fillVertexBuffer(vertices, position, scale, rotation);
@@ -116,6 +144,13 @@ export class Renderer
     }
 
     // Function for filling buffer with vertexdata,
+    /**
+     * CPU-side model transform:
+     * - Rotate around triangle centroid (local pivot)
+     * - Scale
+     * - Translate to world, then to screen (canvas center)
+     * Then writes final positions/colors into the shared Float32Array buffer.
+     */
     fillVertexBuffer(vertices, position, scale, rotation)
     {
         let i = this.instanceCount * BUFFER_SIZE; // ensure we start at the correct position in the buffer. so if instanceCount is 0, we start at 0, and if its 1 we start 1 * BUFFER_SIZE.
@@ -167,43 +202,6 @@ export class Renderer
         this.data[10 + i] = this.v2[0] + ox;
         this.data[11 + i] = this.v2[1] + oy;
         this.data[12 + i] = vertices[12]; this.data[13 + i] = vertices[13]; this.data[14 + i] = vertices[14];
-        /*
-        this.v0[0] = vertices[0] + this.canvasCenterX;
-        this.v0[1] = vertices[1] + this.canvasCenterY;
-        this.v1[0] = vertices[5] + this.canvasCenterX;
-        this.v1[1] = vertices[6] + this.canvasCenterY;
-        this.v2[0] = vertices[10] + this.canvasCenterX;
-        this.v2[1] = vertices[11] + this.canvasCenterY;
-
-        if (rotation != 0)
-        {
-            this.rotationOrigin[0] = (this.v0[0] + this.v1[0] + this.v2[0]) / 3.0;
-            this.rotationOrigin[1] = (this.v0[1] + this.v1[1] + this.v2[1]) / 3.0;
-
-            vec2.rotate(this.v0, this.v0, this.rotationOrigin, rotation);
-            vec2.rotate(this.v1, this.v1, this.rotationOrigin, rotation);
-            vec2.rotate(this.v2, this.v2, this.rotationOrigin, rotation);
-
-        }
-
-        this.data[0 + i] = this.v0[0];
-        this.data[1 + i] = this.v0[1];
-        this.data[2 + i] = 1;
-        this.data[3 + i] = 1;
-        this.data[4 + i] = 1;
-
-        this.data[5 + i] = this.v1[0];
-        this.data[6 + i] = this.v1[1];
-        this.data[7 + i] = 1;
-        this.data[8 + i] = 1;
-        this.data[9 + i] = 1;
-
-        this.data[10 + i] = this.v2[0];
-        this.data[11 + i] = this.v2[1];
-        this.data[12 + i] = 1;
-        this.data[13 + i] = 1;
-        this.data[14 + i] = 1;
-        */
 
         this.instanceCount++; // increment instances after filling up all the data for one object.
     }
